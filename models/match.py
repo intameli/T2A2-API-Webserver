@@ -28,7 +28,8 @@ class Match(db.Model):
 
 
 class MatchSchema(ma.Schema):
-    players = fields.Nested("PlayerSchema", many=True, exclude=("matches",))
+    players = fields.Nested("PlayerSchema", many=True,
+                            exclude=("matches", "email", "password", "admin"))
     court = fields.Nested("CourtSchema")
     results = fields.Nested(
         "Match_PlayerSchema", many=True)

@@ -19,6 +19,7 @@ class Match_Player(db.Model):
     )
     result: Mapped[Optional[str]] = mapped_column(String(10))
     games_won: Mapped[Optional[int]] = mapped_column(Integer)
+    tie_break: Mapped[Optional[int]] = mapped_column(Integer)
 
     player: Mapped["Player"] = relationship(
         back_populates="matches_ass")
@@ -31,7 +32,7 @@ class Match_PlayerSchema(ma.Schema):
     # court = fields.Nested("CourtSchema")
 
     class Meta:
-        fields = ('result', 'player_id', 'games_won')
+        fields = ('result', 'player_id', 'games_won', 'tie_break')
 
 
 # class Player(db.Model):

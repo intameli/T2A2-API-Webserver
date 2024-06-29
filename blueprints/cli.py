@@ -1,5 +1,5 @@
 from flask import Blueprint
-from init import db
+from init import db, bcrypt
 from datetime import datetime
 from models.match import Match, MatchSchema
 from models.player import Player
@@ -14,7 +14,18 @@ def create_db():
     db.drop_all()
     db.create_all()
 
-    db.session.add_all([Player(name='Jacob'), Player(name='Alex')])
+    db.session.add_all([
+        Player(
+            name='Jacob',
+            email='jacob@gmail.com',
+            password=bcrypt.generate_password_hash("password").decode("utf8"),
+            admin=True
+        ),
+        Player(
+            name='Alex',
+            email='alex@gmail.com',
+            password=bcrypt.generate_password_hash("secret").decode("utf8")
+        )])
     db.session.add(Court(surface='hard'))
     db.session.add(Court(surface='grass'))
     db.session.commit()

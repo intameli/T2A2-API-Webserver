@@ -3,41 +3,30 @@ from models.match import Match, MatchSchema
 from models.player import Player, PlayerSchema
 from models.match_player import Match_Player, Match_PlayerSchema
 from init import db
+from flask_jwt_extended import jwt_required
+from auth import admin_only
 
 match_bp = Blueprint('matches', __name__, url_prefix='/matches')
 
 
-@match_bp.route('/join')
-def join_table():
-    stmt = db.select(Match_Player)
-    matches = db.session.scalars(stmt).all()
-    return Match_PlayerSchema(many=True).dump(matches)
-
-
-@match_bp.route('/a')
-def all_players():
-    stmt = db.select(Player)
-    matches = db.session.scalars(stmt).all()
-    return PlayerSchema(many=True).dump(matches)
-
-
 @match_bp.route('/')
+@jwt_required()
 def all_matches():
     stmt = db.select(Match)
     matches = db.session.scalars(stmt).all()
     return MatchSchema(many=True).dump(matches)
 
 
-@match_bp.route('/b')
-def single_match():
-    matches = db.get_or_404(Match, 1)
+@match_bp.route("/<int:id>")
+@jwt_required()
+def single_match(id):
+    matches = db.get_or_404(Match, id)
     return MatchSchema(exclude=('court_id',)).dump(matches)
 
 
 # Create
-
 @match_bp.route("/", methods=["POST"])
-# @jwt_required()
+@admin_only
 def create_match():
     match_info = MatchSchema(only=["time", "players", "court_id"], unknown="exclude").load(
         request.json
@@ -63,11 +52,9 @@ def create_match():
 
 
 @match_bp.route("/<int:id>", methods=["PUT", "PATCH"])
-# @jwt_required()
+@admin_only
 def update_match(id):
     match = db.get_or_404(Match, id)
-    # authorize_owner(card)
-
     match_info = MatchSchema(only=["time", 'results', 'court_id'], unknown="exclude").load(
         request.json
     )
@@ -79,15 +66,12 @@ def update_match(id):
         new_result = next(
             (x for x in new_results if x['player_id'] == result.player_id), None)
         result.games_won = new_result['games_won']
+        result.tie_break = new_result.get('tie_break', result.tie_break)
         if result.games_won > most_games:
             winner = result.player_id
-        elif result.games_won == most_games:
-            winner = 0
         most_games = result.games_won
     for result in match.results:
-        if winner == 0:
-            result.result = 'Tie'
-        elif result.player_id == winner:
+        if result.player_id == winner:
             result.result = 'Winner'
         else:
             result.result = 'Loser'
@@ -97,9 +81,8 @@ def update_match(id):
 
 
 # Delete
-
 @match_bp.route("/<int:id>", methods=["DELETE"])
-# @jwt_required()
+@admin_only
 def delete_match(id):
     match = db.get_or_404(Match, id)
     # authorize_owner(card)
