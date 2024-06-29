@@ -1,13 +1,10 @@
 from init import db, ma
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, Boolean
+from sqlalchemy import String, Boolean
 from typing import List
-from datetime import datetime
 from marshmallow import fields
 from marshmallow.validate import Length
 from sqlalchemy.ext.associationproxy import association_proxy
-from typing import Optional
-from sqlalchemy import ForeignKey
 
 
 class Player(db.Model):

@@ -1,12 +1,8 @@
 from init import db, ma
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer
 from typing import List
 from datetime import datetime
 from sqlalchemy.ext.associationproxy import association_proxy
-# from marshmallow.validate import Length
-
-from typing import Optional
 from sqlalchemy import ForeignKey
 from marshmallow import fields
 

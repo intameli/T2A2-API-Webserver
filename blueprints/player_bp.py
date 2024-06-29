@@ -21,6 +21,11 @@ def all_players():
 
 @player_bp.route("/login", methods=["POST"])
 def login():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     params = PlayerSchema(only=["email", "password"]).load(
         request.json, unknown="exclude"
     )
