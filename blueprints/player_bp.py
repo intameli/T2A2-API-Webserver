@@ -1,6 +1,5 @@
 from datetime import timedelta
 from flask import Blueprint
-# from auth import admin_only
 from flask import request
 from flask_jwt_extended import create_access_token, jwt_required
 from init import db, bcrypt
@@ -11,20 +10,23 @@ from auth import admin_only
 player_bp = Blueprint("players", __name__, url_prefix='/players')
 
 
-@player_bp.route('/')
+@player_bp.route('/<int:id>')
 @jwt_required()
-def all_players():
-    stmt = db.select(Player)
-    matches = db.session.scalars(stmt).all()
-    return PlayerSchema(many=True).dump(matches)
+def all_players(id):
+    """get one player by id
+
+    A player object is retrieved from the db 
+    player objects contain direct access to match_player
+    """
+    player = db.get_or_404(Player, id)
+    return PlayerSchema(exclude=("password",)).dump(player)
 
 
 @player_bp.route("/login", methods=["POST"])
 def login():
-    """_summary_
+    """ logs in a player
 
-    Returns:
-        _type_: _description_
+    Player object that has matching email is retrieved from the db
     """
     params = PlayerSchema(only=["email", "password"]).load(
         request.json, unknown="exclude"
@@ -33,7 +35,7 @@ def login():
     player = db.session.scalar(stmt)
     if player and bcrypt.check_password_hash(player.password, params["password"]):
         token = create_access_token(
-            identity=player.id, expires_delta=timedelta(hours=2))
+            identity=player.id, expires_delta=timedelta(hours=10))
         return {"token": token}
     else:
         return {"error": "Invalid email or password"}, 401
@@ -42,6 +44,19 @@ def login():
 @player_bp.route('/', methods=['POST'])
 @admin_only
 def create_player():
-    params = PlayerSchema(
-        only=["email", "password", "name", "is_admin"]).load(request.json)
-    return params
+    """ create new player
+
+    no db queries
+    """
+    player_info = PlayerSchema(
+        only=["email", "password", "name", "admin"]).load(request.json)
+    password = player_info['password']
+    player = Player(
+        name=player_info['name'],
+        email=player_info['email'],
+        password=bcrypt.generate_password_hash(password).decode("utf8"),
+        admin=player_info.get('admin', False)
+    )
+    db.session.add(player)
+    db.session.commit()
+    return PlayerSchema(exclude=('password',)).dump(player), 201

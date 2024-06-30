@@ -2,6 +2,8 @@
 
 Jacob Smith
 
+[GitHub Repo](https://github.com/intameli/T2A2-API-Webserver)
+
 Note: Database queries in the API are documented in the docstrings of their respective functions. Docstrings use the google style guide as well as following PEP 8.
 
 ## R1
@@ -65,3 +67,19 @@ The back_populates keyword specifies a two way relationship, allowing direct acc
 need more, need info about queries, maybe some of this should be in R5?
 
 ## R8
+
+![login](docs/login.png)
+
+![create player](docs/create_player.png)
+
+![get player](docs/get_player.png)
+
+![create match](docs/atch_create.png)
+
+![delete](docs/delete.png)
+
+![update](docs/update.png)
+
+![one match](docs/one_match.png)
+
+![all matches](docs/all_matches.png)

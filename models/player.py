@@ -22,10 +22,12 @@ class Player(db.Model):
 
 
 class PlayerSchema(ma.Schema):
-    matches = fields.Nested('MatchSchema', many=True, exclude=("players",))
+    matches = fields.Nested('MatchSchema', many=True,
+                            exclude=("players", "court_id"))
+    name = fields.String()
     email = fields.Email(required=True)
     password = fields.String(validate=Length(
-        min=6, error='Password must be at least 8 characters long'), required=True)
+        min=6, error='Password must be at least 6 characters long'), required=True)
 
     class Meta:
         fields = ("id", "name", "matches", "email", "password", "admin")

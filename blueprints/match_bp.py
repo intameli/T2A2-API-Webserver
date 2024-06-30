@@ -14,7 +14,7 @@ match_bp = Blueprint('matches', __name__, url_prefix='/matches')
 def all_matches():
     stmt = db.select(Match)
     matches = db.session.scalars(stmt).all()
-    return MatchSchema(many=True).dump(matches)
+    return MatchSchema(many=True, exclude=("court_id",)).dump(matches)
 
 
 @match_bp.route("/<int:id>")
@@ -31,7 +31,6 @@ def create_match():
     match_info = MatchSchema(only=["time", "players", "court_id"], unknown="exclude").load(
         request.json
     )
-    print(match_info['players'][1]['id'])
     match = Match(
         time=match_info["time"],
         court_id=match_info['court_id']
@@ -48,36 +47,41 @@ def create_match():
     ]
     db.session.add_all(join)
     db.session.commit()
-    return MatchSchema().dump(match), 201
+    return MatchSchema(exclude=("court_id",)).dump(match), 201
 
 
 @match_bp.route("/<int:id>", methods=["PUT", "PATCH"])
 @admin_only
 def update_match(id):
+    """ update 
+
+
+    """
     match = db.get_or_404(Match, id)
     match_info = MatchSchema(only=["time", 'results', 'court_id'], unknown="exclude").load(
         request.json
     )
     match.time = match_info.get("time", match.time)
-    new_results = match_info.get("results", match.results)
-    most_games = -1
-    winner = 0
-    for result in match.results:
-        new_result = next(
-            (x for x in new_results if x['player_id'] == result.player_id), None)
-        result.games_won = new_result['games_won']
-        result.tie_break = new_result.get('tie_break', result.tie_break)
-        if result.games_won > most_games:
-            winner = result.player_id
-        most_games = result.games_won
-    for result in match.results:
-        if result.player_id == winner:
-            result.result = 'Winner'
-        else:
-            result.result = 'Loser'
+    new_results = match_info.get("results", 0)
+    if new_results:
+        most_games = -1
+        winner = 0
+        for result in match.results:
+            new_result = next(
+                (x for x in new_results if x['player_id'] == result.player_id), None)
+            result.games_won = new_result['games_won']
+            result.tie_break = new_result.get('tie_break', result.tie_break)
+            if result.games_won > most_games:
+                winner = result.player_id
+            most_games = result.games_won
+        for result in match.results:
+            if result.player_id == winner:
+                result.result = 'Winner'
+            else:
+                result.result = 'Loser'
     match.court_id = match_info.get("court_id", match.court_id)
     db.session.commit()
-    return MatchSchema().dump(match)
+    return MatchSchema(exclude=("court_id",)).dump(match)
 
 
 # Delete

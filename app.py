@@ -3,6 +3,7 @@ from blueprints.cli import commands
 from blueprints.match_bp import match_bp
 from blueprints.player_bp import player_bp
 from marshmallow.exceptions import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 
 app.register_blueprint(commands)
@@ -24,3 +25,8 @@ def invalid_request(err):
 @app.errorhandler(KeyError)
 def missing_key(err):
     return {"error": f"Missing field: {str(err)}"}, 400
+
+
+@app.errorhandler(IntegrityError)
+def dup_key(err):
+    return {"error": "email already associated with another player"}

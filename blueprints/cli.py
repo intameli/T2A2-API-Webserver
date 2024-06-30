@@ -10,7 +10,7 @@ commands = Blueprint('db', __name__)
 
 
 @commands.cli.command('create')
-def create_db():
+def create_tables():
     db.drop_all()
     db.create_all()
 
@@ -40,4 +40,4 @@ def create_db():
 
     db.session.add_all(arr)
     db.session.commit()
-    print('Test Data Added')
+    print('Data Added')
