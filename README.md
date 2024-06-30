@@ -68,18 +68,86 @@ need more, need info about queries, maybe some of this should be in R5?
 
 ## R8
 
+### /players
+
+POST /player/login
+
+This endpoint logs in a player and returns a JWT token. This is the only endpoint that does not require a JWT in the reqest to work. All requests below require a valid JWT such as the one pictured below to work.
+
 ![login](docs/login.png)
+
+One possible bad request is omiting the password which would return the following.
+
+```
+{
+	"error": {
+		"password": [
+			"Missing data for required field."
+		]
+	}
+}
+```
+
+POST /players
+
+This request creates a new player. Email, name and password are required and admin is optional. If no admin is provided, the value is set to false by default. This request requires a JWT which is associated with an existing admin player to work.
 
 ![create player](docs/create_player.png)
 
+The password must be atleast 6 characters long. If it isn't the following error will be returned.
+
+```
+{
+	"error": {
+		"password": [
+			"Password must be at least 6 characters long"
+		]
+	}
+}
+```
+
+GET /player/id
+
+This request returns a specific player by their id. It omits their password and includes their matches in the response. The JWT does not need to be associated with an admin for this request to work.
+
 ![get player](docs/get_player.png)
+
+Providing an id which does not exist returns the following error.
+
+```
+{
+	"error": "Not Found"
+}
+```
+
+### /matches
+
+POST /matches/
+
+This endpoint creates a match. Only admins can use this endpoint. All fields must be provided. The result of the match is not provided as this endpoint is for creating matches to be played in the future. The results are updated later once the match has been played.
 
 ![create match](docs/atch_create.png)
 
+DELETE /matches/id
+
+This endpoint deletes a match with the provided id. Only admins are authorised to do this. The entries that relate to the match in the match_player join table are also deleted.
+
 ![delete](docs/delete.png)
+
+PATCH/PUT /matches/id
+
+This endpoint updates a match. Only the columns you want updated need to be provided. This endpoint is only avaiable to admins.
 
 ![update](docs/update.png)
 
+GET /matches/id
+
+This endpoint returns one match from its id including a list of the players associated and the results. Admin is not required, only a valid JWT.
+
 ![one match](docs/one_match.png)
+
+GET /matches
+
+This endpoint returns all matches in the database. Admin is not required, only a valid JWT.
 
 ![all matches](docs/all_matches.png)

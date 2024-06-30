@@ -8,6 +8,11 @@ from models.player import Player
 
 
 def admin_only(fn):
+    """ check admin
+
+    The database is queried for a player with an id that matches
+    the id in the JWT and that also has a true admin value
+    """
     @wraps(fn)
     @jwt_required()
     def inner(**kwargs):

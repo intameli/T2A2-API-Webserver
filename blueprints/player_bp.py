@@ -15,8 +15,9 @@ player_bp = Blueprint("players", __name__, url_prefix='/players')
 def all_players(id):
     """get one player by id
 
-    A player object is retrieved from the db 
-    player objects contain direct access to match_player
+    A player object is retrieved from the db.
+    player objects contain direct access their associated 
+    match_player and match objects through the ORM
     """
     player = db.get_or_404(Player, id)
     return PlayerSchema(exclude=("password",)).dump(player)

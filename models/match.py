@@ -33,19 +33,3 @@ class MatchSchema(ma.Schema):
     class Meta:
         fields = ("id", "time", "court", "players",
                   "results", 'court_id')
-
-
-# class Player(db.Model):
-#     __tablename__ = "players"
-
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     name: Mapped[str] = mapped_column(String(100))
-#     age: Mapped[int] = mapped_column(Integer())
-
-#     matches: Mapped[List['Match_Player']] = relationship(
-#         back_populates='matches')
-
-
-# class PlayerSchema(ma.Schema):
-#     class Meta:
-#         fields = ['id', 'name', 'age']

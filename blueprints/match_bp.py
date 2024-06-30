@@ -1,7 +1,6 @@
 from flask import Blueprint, request
 from models.match import Match, MatchSchema
-from models.player import Player, PlayerSchema
-from models.match_player import Match_Player, Match_PlayerSchema
+from models.match_player import Match_Player
 from init import db
 from flask_jwt_extended import jwt_required
 from auth import admin_only
@@ -12,6 +11,10 @@ match_bp = Blueprint('matches', __name__, url_prefix='/matches')
 @match_bp.route('/')
 @jwt_required()
 def all_matches():
+    """ get all matches
+
+    db is queried for all matches
+    """
     stmt = db.select(Match)
     matches = db.session.scalars(stmt).all()
     return MatchSchema(many=True, exclude=("court_id",)).dump(matches)
@@ -20,14 +23,21 @@ def all_matches():
 @match_bp.route("/<int:id>")
 @jwt_required()
 def single_match(id):
+    """ get a single match
+
+    The db is queried for a single match with a corresponding id
+    """
     matches = db.get_or_404(Match, id)
     return MatchSchema(exclude=('court_id',)).dump(matches)
 
 
-# Create
 @match_bp.route("/", methods=["POST"])
 @admin_only
 def create_match():
+    """ create a new match
+
+    no db queries in this endpoint
+    """
     match_info = MatchSchema(only=["time", "players", "court_id"], unknown="exclude").load(
         request.json
     )
@@ -53,9 +63,9 @@ def create_match():
 @match_bp.route("/<int:id>", methods=["PUT", "PATCH"])
 @admin_only
 def update_match(id):
-    """ update 
+    """ update match
 
-
+    The db is queried for a single match with a corresponding id
     """
     match = db.get_or_404(Match, id)
     match_info = MatchSchema(only=["time", 'results', 'court_id'], unknown="exclude").load(
@@ -84,12 +94,14 @@ def update_match(id):
     return MatchSchema(exclude=("court_id",)).dump(match)
 
 
-# Delete
 @match_bp.route("/<int:id>", methods=["DELETE"])
 @admin_only
 def delete_match(id):
+    """ delete a match
+
+    The db is queried for a single match with a corresponding id
+    """
     match = db.get_or_404(Match, id)
-    # authorize_owner(card)
     db.session.delete(match)
     db.session.commit()
     return {}

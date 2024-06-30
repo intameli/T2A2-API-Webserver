@@ -1,7 +1,7 @@
 from flask import Blueprint
 from init import db, bcrypt
 from datetime import datetime
-from models.match import Match, MatchSchema
+from models.match import Match
 from models.player import Player
 from models.match_player import Match_Player
 from models.court import Court
@@ -30,7 +30,6 @@ def create_tables():
     db.session.add(Court(surface='grass'))
     db.session.commit()
 
-    # m = Match(time=datetime(2024, 7, 2, 10))
     m = Match(time=datetime(2024, 7, 2, 10), court_id=1)
 
     db.session.add(m)

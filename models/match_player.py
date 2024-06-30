@@ -23,24 +23,5 @@ class Match_Player(db.Model):
 
 
 class Match_PlayerSchema(ma.Schema):
-    # players = fields.Nested("PlayerSchema", many=True, exclude=("matches",))
-    # court = fields.Nested("CourtSchema")
-
     class Meta:
         fields = ('result', 'player_id', 'games_won', 'tie_break')
-
-
-# class Player(db.Model):
-#     __tablename__ = "players"
-
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     name: Mapped[str] = mapped_column(String(100))
-#     age: Mapped[int] = mapped_column(Integer())
-
-#     matches: Mapped[List['Match_Player']] = relationship(
-#         back_populates='matches')
-
-
-# class PlayerSchema(ma.Schema):
-#     class Meta:
-#         fields = ['id', 'name', 'age']
